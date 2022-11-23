@@ -49,4 +49,9 @@ public class FilmController {
                                                  @RequestParam String sortBy) {
         return filmService.getSortedDirectorFilms(directorId, sortBy);
     }
+
+    @GetMapping("/search")
+    public List<Film> getTopSortedSearchedFilms(@RequestParam String query,@RequestParam String by) {
+        return filmService.getTopSortedSearchedFilms(query, by);
+    }
 }

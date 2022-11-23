@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.film.Film;
+import ru.yandex.practicum.filmorate.model.film.SearchType;
 import ru.yandex.practicum.filmorate.model.film.SortType;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,21 +79,46 @@ public class FilmService {
     }
 
     public List<Film> getSortedDirectorFilms(Long directorId, String sortBy) {
-        SortType sortType;
-        try {
-            sortType = SortType.valueOf(sortBy.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Некорректный тип сортировки");
-        }
         directorService.findDirectorById(directorId);
+        SortType sortType = SortType.valueOf(sortBy.toUpperCase());
         List<Film> films;
         if (sortType == SortType.YEAR) {
             films = filmStorage.getDirectorFilmsSortedByYear(directorId);
-        } else {
+        } else if (sortType == SortType.LIKES) {
             films = filmStorage.getDirectorFilmsSortedByLikes(directorId);
+        } else {
+            throw new IllegalArgumentException("Некорректный тип сортировки");
         }
         genreService.loadGenres(films);
         directorService.loadDirectors(films);
+        return films;
+    }
+
+    public List<Film> getTopSortedSearchedFilms(String query, String by) {
+        List<SearchType> searchType = Arrays.stream(by.toUpperCase().split(",")).map(SearchType::valueOf).collect(Collectors.toList());
+        List<Film> films = filmStorage.getTopFilmsWithoutLimit();
+        genreService.loadGenres(films);
+        directorService.loadDirectors(films);
+        if (searchType.size() == 1 && searchType.get(0) == SearchType.DIRECTOR) {
+            films = films.stream()
+                    .filter(film -> film.getDirectors()
+                            .stream()
+                            .anyMatch(director -> director.getName().toLowerCase().contains(query.toLowerCase())))
+                    .collect(Collectors.toList());
+        } else if (searchType.size() == 1 && searchType.get(0) == SearchType.TITLE) {
+            films = films.stream()
+                    .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        } else if (searchType.size() == 2 && searchType.get(0) != searchType.get(1)) {
+            films = films.stream()
+                    .filter(film -> film.getDirectors()
+                            .stream()
+                            .anyMatch(director -> director.getName().toLowerCase().contains(query.toLowerCase()))
+                            || film.getName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        } else {
+            throw new IllegalArgumentException("Некорректный тип поиска");
+        }
         return films;
     }
 }

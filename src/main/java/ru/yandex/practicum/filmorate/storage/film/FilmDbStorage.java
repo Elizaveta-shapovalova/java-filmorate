@@ -86,6 +86,7 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
+    @Override
     public List<Film> getTopFilms(Integer count) {
         String sqlQuery = "SELECT * " +
                 "FROM MOVIE AS m " +
@@ -98,6 +99,19 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
+    @Override
+    public List<Film> getTopFilmsWithoutLimit() {
+        String sqlQuery = "SELECT * " +
+                "FROM MOVIE AS m " +
+                "INNER JOIN MPA ON MPA.id = m.mpa_id " +
+                "LEFT JOIN likes AS l ON l.film_id = m.id " +
+                "GROUP BY m.id " +
+                "ORDER BY COUNT(l.user_id) DESC";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+    }
+
+    @Override
     public List<Film> getDirectorFilmsSortedByYear(Long directorId) {
         String sqlQuery = "SELECT * " +
                 "FROM MOVIE M " +
@@ -110,6 +124,7 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
 
+    @Override
     public List<Film> getDirectorFilmsSortedByLikes(Long directorId) {
         String sqlQuery = "SELECT * " +
                 "FROM MOVIE M " +
