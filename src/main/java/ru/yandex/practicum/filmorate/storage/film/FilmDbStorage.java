@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Repository("filmStorage")
@@ -66,8 +67,7 @@ public class FilmDbStorage implements FilmStorage {
                 , film.getRate()
                 , film.getMpa().getId()
                 , film.getId())
-                == 0)
-        {
+                == 0) {
             throw new FilmNotFoundException(String.format("Film with %d id not found", film.getId()));
         }
         return film;
@@ -87,16 +87,49 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getTopFilms(Integer count) {
-        String sqlQuery = "SELECT * " +
-                "FROM MOVIE AS m " +
-                "INNER JOIN MPA ON MPA.id = m.mpa_id " +
-                "LEFT JOIN likes AS l ON l.film_id = m.id " +
-                "GROUP BY m.id " +
-                "ORDER BY COUNT(l.user_id) DESC " +
+    public List<Film> getTopFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
+        String sqlQuery;
+        if (genreId.isEmpty() && year.isEmpty()) {
+            sqlQuery = "SELECT * " +
+                    "FROM MOVIE M " +
+                    "INNER JOIN MPA ON MPA.ID = M.MPA_ID " +
+                    "LEFT JOIN LIKES L ON L.FILM_ID = M.ID " +
+                    "GROUP BY M.ID " +
+                    "ORDER BY COUNT(L.USER_ID) DESC " +
+                    "LIMIT ?";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        } else if (genreId.isPresent() && year.isEmpty()) {
+            sqlQuery = "SELECT * " +
+                    "FROM MOVIE M " +
+                    "INNER JOIN MPA ON M.MPA_ID = MPA.ID " +
+                    "LEFT JOIN LIKES L ON M.ID = L.FILM_ID " +
+                    "LEFT JOIN FILM_GENRE FG ON M.ID = FG.FILM_ID " +
+                    "WHERE FG.GENRE_ID = ? " +
+                    "GROUP BY M.ID " +
+                    "ORDER BY COUNT(L.USER_ID) DESC " +
+                    "LIMIT ?";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, genreId.get(), count);
+        } else if (genreId.isEmpty()) {
+            sqlQuery = "SELECT * " +
+                    "FROM MOVIE M " +
+                    "INNER JOIN MPA ON M.MPA_ID = MPA.ID " +
+                    "LEFT JOIN LIKES L ON M.ID = L.FILM_ID " +
+                    "WHERE YEAR(M.RELEASE_DATE) = ? " +
+                    "GROUP BY M.ID " +
+                    "ORDER BY COUNT(L.USER_ID) DESC " +
+                    "LIMIT ?";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, year.get(), count);
+        }
+        sqlQuery = "SELECT * " +
+                "FROM MOVIE M " +
+                "INNER JOIN MPA ON M.MPA_ID = MPA.ID " +
+                "LEFT JOIN LIKES L ON M.ID = L.FILM_ID " +
+                "LEFT JOIN FILM_GENRE FG ON M.ID = FG.FILM_ID " +
+                "WHERE FG.GENRE_ID = ? AND YEAR(M.RELEASE_DATE) = ? " +
+                "GROUP BY M.ID " +
+                "ORDER BY COUNT(L.USER_ID) DESC " +
                 "LIMIT ?";
-
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, genreId.get(), year.get(), count);
     }
 
     @Override

@@ -12,15 +12,13 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
-import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.like.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,15 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FilmDbTest {
     private final JdbcTemplate jdbcTemplate;
     private final FilmDbStorage filmDbStorage;
-    private final UserDbStorage userDbStorage;
-    private final LikeDbStorage likeDbStorage;
 
     private Film getFilm() {
         return Film.builder().name("testName").releaseDate(Date.valueOf("1979-04-17").toLocalDate()).description("testDescription").duration(100).rate(4).mpa(Mpa.builder().id(1L).name("G").build()).genres(new LinkedHashSet<>()).directors(new LinkedHashSet<>()).build();
-    }
-
-    private User getUser() {
-        return User.builder().email("test@mail.ru").login("testLogin").name("testName").birthday(Date.valueOf("1946-08-20").toLocalDate()).build();
     }
 
     private Genre getGenre() {
@@ -137,23 +129,7 @@ public class FilmDbTest {
 
     @Test
     void testGetEmptyTopFilms() {
-        assertEquals(new ArrayList<>(), filmDbStorage.getTopFilms(10));
-    }
-
-    @Test
-    void testFindOnePopularFilm() {
-        userDbStorage.create(getUser());
-        filmDbStorage.create(getFilm());
-        Film film = filmDbStorage.create(getFilm());
-        likeDbStorage.addLike(1L, 2L);
-        assertEquals(List.of(film), filmDbStorage.getTopFilms(1));
-    }
-
-    @Test
-    void testFindTwoPopularFilms() {
-        Film film = filmDbStorage.create(getFilm());
-        Film film2 = filmDbStorage.create(getFilm());
-        assertEquals(List.of(film, film2), filmDbStorage.getTopFilms(10));
+        assertEquals(new ArrayList<>(), filmDbStorage.getTopFilms(10, Optional.empty(), Optional.empty()));
     }
 
     @Test

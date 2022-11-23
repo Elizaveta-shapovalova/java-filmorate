@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,8 +66,8 @@ public class FilmService {
         return film;
     }
 
-    public List<Film> getTopFilms(Integer count) {
-        List<Film> films = filmStorage.getTopFilms(count);
+    public List<Film> getTopFilms(Integer count, Optional<Integer> genreId, Optional<Integer> year) {
+        List<Film> films = filmStorage.getTopFilms(count, genreId, year);
         genreService.loadGenres(films);
         directorService.loadDirectors(films);
         return films;
