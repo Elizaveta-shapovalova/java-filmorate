@@ -73,3 +73,13 @@ SELECT M.*, MPA.*, IFNULL(AVG(MR.MARK), 0) AS RATE
 
   </p>
 </details>
+
+### _Team Lead:_
+
+[![](https://avatars.githubusercontent.com/u/102436358?s=50)](https://github.com/Elizaveta-shapovalova)
+
+### _Team Members:_
+
+[![](https://avatars.githubusercontent.com/u/103571329?s=50)](https://github.com/o10i)
+[![](https://avatars.githubusercontent.com/u/86060095?s=50)](https://github.com/Lamanxo)
+[![](https://avatars.githubusercontent.com/u/64646736?s=50)](https://github.com/IPilin)
