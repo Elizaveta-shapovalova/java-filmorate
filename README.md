@@ -18,7 +18,7 @@ Added new functionality during a group project:
  
  -  Java 11
  -  To work with the database used: [JdbcTemplate](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/storage/film/FilmDbStorage.java).
- - For validation was used: [Interfaces](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/model/film/Film.java) for separation of field validation and custom [Annotation](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/validation/film/FilmReleaseDateConstraint.java).
+ - For validation was used: Lombok with [Interfaces](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/model/film/Film.java) for separation of field validation and custom [Annotation](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/validation/film/FilmReleaseDateConstraint.java).
  - The whole layer of Storage DB was covered with tests [tests](https://github.com/Elizaveta-shapovalova/java-filmorate/tree/main/src/test/java/ru/yandex/practicum/filmorate/DbTests).
  - Also, n-request to the database were excluded.
  - Dependencies were connected using Maven.
