@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.controller.film;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.service.LikeService;
+import ru.yandex.practicum.filmorate.service.film.LikeService;
 
 @RestController
 @RequestMapping("/films/{id}/like/{userId}")
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class LikeController {
-
-    private final LikeService likeService;
+    LikeService likeService;
 
     @PutMapping
     public void addLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {

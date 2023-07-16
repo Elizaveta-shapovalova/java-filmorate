@@ -5,8 +5,6 @@ import ru.yandex.practicum.filmorate.model.film.Mpa;
 import java.util.List;
 
 public interface MpaStorage {
-    List<Mpa> findAllMPA();
-
-    Mpa findMPAById(Long mpaId);
-
+    List<Mpa> getAll();
+    Mpa getById(Long id);
 }

@@ -4,33 +4,35 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
+import ru.yandex.practicum.filmorate.model.Marker;
+import ru.yandex.practicum.filmorate.validation.film.FilmReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
-
-@Builder
 @Data
-@FieldDefaults(level= AccessLevel.PRIVATE)
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Film {
+    @NotNull(groups = {Marker.OnUpdate.class})
     Long id;
-    @NotBlank
+    @NotBlank(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
     String name;
-    @Size(max = 200)
+    @NotNull(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
+    @Size(groups = {Marker.OnCreate.class, Marker.OnUpdate.class}, max = 200)
     String description;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
+    @FilmReleaseDateConstraint(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
     LocalDate releaseDate;
-    @Positive
-    int duration;
-    int rate;
-
+    @Positive(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
+    Integer duration;
+    Double rate;
+    @NotNull(groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
     Mpa mpa;
-
     LinkedHashSet<Genre> genres;
-
-
+    LinkedHashSet<Director> directors;
 }

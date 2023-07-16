@@ -1,41 +1,39 @@
 package ru.yandex.practicum.filmorate.DbTests;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
-import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@AutoConfigureTestDatabase
+@AutoConfigureTestDatabase()
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MpaDbTest {
-
-    private final MpaDbStorage mpaDbStorage;
+    MpaDbStorage mpaDbStorage;
 
     @Test
-    public void findAllMpa() {
-        assertNotNull(mpaDbStorage.findAllMPA(), "Mpa is empty");
+    void testFindMpaById() {
+        assertEquals(Mpa.builder().id(1L).name("G").build(), mpaDbStorage.getById(1L));
     }
 
     @Test
-    public void testFindMpaById() {
-        Optional<Mpa> mpaOptional = Optional.ofNullable(mpaDbStorage.findMPAById(1L));
-        assertThat(mpaOptional)
-                .isPresent()
-                .hasValueSatisfying(mpa ->
-                        assertThat(mpa).hasFieldOrPropertyWithValue("id", 1L)
-                );
+    void testFindUnknownMpa() {
+        assertThrows(ObjectNotFoundException.class, () -> mpaDbStorage.getById(-1L), "Mpa с id -1 не найден.");
+    }
 
-        assertThrows(DataNotFoundException.class, () -> mpaDbStorage.findMPAById(-4L));
+    @Test
+    void testFindAllMpa() {
+        assertEquals(Mpa.builder().id(1L).name("G").build(), mpaDbStorage.getAll().get(0));
+        assertEquals(5, mpaDbStorage.getAll().size());
     }
 }
