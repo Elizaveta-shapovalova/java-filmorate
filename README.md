@@ -1,69 +1,75 @@
-# Filmorate
+## Filmorate :film_projector:
 
-Бэкенд сервиса для оценки фильмов
+Group project to create an application for film lovers and communication.
 
-Добавлена новая функциональность:
--Функциональность  «Отзывы»
--Функциональность «Поиск»
--Функциональность «Общие фильмы»
--Функциональность «Рекомендации»
--Функциональность «Лента событий»
--Удаление фильмов и пользователей
--Добавление режиссёров в фильмы
--Вывод самых популярных фильмов по жанру и годам
+Added new functionality during a group project:
+- Reviews
+- Search
+- Shared Movies
+- Recommendations
+- Event Feed
+- Delete movies and users
+- Add directors to movies
+- Display the most popular movies by genre and year
+
+---
+
+### _Development:_
+ 
+ -  Java 11
+ -  To work with the database used: [JdbcTemplate](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/storage/film/FilmDbStorage.java).
+ - For validation was used: [Interfaces](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/model/film/Film.java) for separation of field validation and custom [Annotation](https://github.com/Elizaveta-shapovalova/java-filmorate/blob/main/src/main/java/ru/yandex/practicum/filmorate/validation/film/FilmReleaseDateConstraint.java).
+ - The whole layer of Storage DB was covered with tests [tests](https://github.com/Elizaveta-shapovalova/java-filmorate/tree/main/src/test/java/ru/yandex/practicum/filmorate/DbTests).
+ - Also, n-request to the database were excluded.
+ - Dependencies were connected using Maven.
 
 
 <details>
   <summary>
-    <h2>Устройство базы данных</h2>
+    <h2>Schema DB</h2>
   </summary>
   <p>
 
-### Диаграмма БД
 ![db schema](img/filmorate_db.png)
-### Примеры запросов
+### Request examples:
 
-#### Получить список всех пользователей:
+#### Get top films by ganre, sorted by rate:
 ```sql
-SELECT * 
-FROM USERS
-LEFT JOIN FOLLOW ON (id = user_id)
+SELECT M.*, MPA.*, FG.*, IFNULL(AVG(MR.MARK), 0) AS RATE
+                    FROM MOVIE M 
+                    INNER JOIN MPA ON M.MPA_ID = MPA.ID 
+                    LEFT JOIN MARKS MR ON M.ID = MR.FILM_ID 
+                    LEFT JOIN FILM_GENRE FG ON M.ID = FG.FILM_ID 
+                    WHERE FG.GENRE_ID = ? 
+                    GROUP BY M.ID, MR.USER_ID 
+                    ORDER BY RATE DESC 
+                    LIMIT ?
 ```
 
-#### Найти пользователя по id:
+#### Get director's films, sorted by release date:
 ```sql
-SELECT * 
-FROM USERS
-LEFT JOIN FOLLOW ON (id = user_id)
-WHERE id = ?
+SELECT M.*, MPA.*, IFNULL(AVG(MR.MARK), 0) AS RATE 
+                    FROM MOVIE M 
+                    LEFT JOIN MPA ON MPA.ID = M.MPA_ID 
+                    LEFT JOIN MARKS MR ON M.ID = MR.FILM_ID 
+                    WHERE M.ID IN (
+                    SELECT FILM_ID 
+                    FROM FILM_DIRECTOR 
+                    WHERE DIRECTOR_ID = ?) 
+                    GROUP BY M.RELEASE_DATE 
+                    ORDER BY M.RELEASE_DATE
 ```
 
-#### Получить общих друзей:
+#### Get films by name, sorted by rate:
 ```sql
-SELECT friend_id
-FROM FOLLOW
-WHERE (user_id = ? OR user_id = ?)
-GROUP BY friend_id
-HAVING COUNT(friend_id) > 1
+SELECT M.*, MPA.*, IFNULL(AVG(MR.MARK), 0) AS RATE 
+                    FROM MOVIE M 
+                    LEFT JOIN MPA ON MPA.ID = M.MPA_ID 
+                    LEFT JOIN MARKS MR ON M.ID = MR.FILM_ID 
+                    WHERE LOWER(M.NAME) LIKE ? 
+                    GROUP BY M.id 
+                    ORDER BY RATE DESC;
 ```
 
-#### Получить фильм по id:
-```sql
-SELECT *
-FROM MOVIE
-WHERE id = ?
-```
-
-#### Получить первые N самых популярных фильмов:
-```sql
-SELECT id,
-       name,
-       COUNT(id)
-FROM MOVIE
-LEFT JOIN LIKES ON id = film_id
-GROUP BY id
-ORDER BY COUNT(id) DESC
-LIMIT ?
-```
   </p>
 </details>
