@@ -86,10 +86,19 @@ SELECT M.*, MPA.*, IFNULL(AVG(MR.MARK), 0) AS RATE
   <img src="https://avatars.githubusercontent.com/u/103571329?"  width="50">
 </a>
 
-<a href="https://github.com/IPilink">
+<a href="https://github.com/IPilin">
   <img src="https://avatars.githubusercontent.com/u/64646736?"  width="50">
 </a>
 
 <a href="https://github.com/Lamanxo">
   <img src="https://avatars.githubusercontent.com/u/86060095?"  width="50">
 </a>
+
+### _Staсk:_
+
+<div>
+  <img src="https://github.com/devicons/devicon/blob/master/icons/java/java-original-wordmark.svg" title="Java" alt="Java" width="40" height="40"/>&nbsp;
+  <img src="https://github.com/devicons/devicon/blob/master/icons/spring/spring-original-wordmark.svg" title="Spring" alt="Spring" width="40" height="40"/>&nbsp;
+  <img src="https://github.com/devicons/devicon/blob/master/icons/postgresql/postgresql-original.svg" title="PostgreSQL" alt="PostgreSQL" width="40" height="40"/>&nbsp;
+  <img src="https://github.com/devicons/devicon/blob/master/icons/apache/apache-original.svg" title="Maven" alt="Maven" width="40" height="40"/>
+</div>
