@@ -94,6 +94,8 @@ SELECT M.*, MPA.*, IFNULL(AVG(MR.MARK), 0) AS RATE
   <img src="https://avatars.githubusercontent.com/u/86060095?"  width="50">
 </a>
 
+---
+
 ### _Staсk:_
 
 <div>
